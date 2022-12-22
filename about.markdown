@@ -3,16 +3,7 @@ layout: page
 title: About
 permalink: /about/
 ---
+I'm Syl, a freelance audio software developer / occasional electronic music producer based in Ireland. Because my job kind of revolves around making things people might actually enjoy using, most of my spare time projects or ideas tend to embrace a more subversive ethos, usually because I think it's cool and or funny and or weird, which sometimes has the side effect of being educational, or god forbid, useful.
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](https://jekyllrb.com/)
+If for some unhinged reason you want to support me, you can [buy me a coffee](https://www.buymeacoffee.com/MeijisIrlnd]) and I'll be eternally grateful, and if you end up using any of the plugins I make I'd love to hear them in action
 
-You can find the source code for Minima at GitHub:
-[jekyll][jekyll-organization] /
-[minima](https://github.com/jekyll/minima)
-
-You can find the source code for Jekyll at GitHub:
-[jekyll][jekyll-organization] /
-[jekyll](https://github.com/jekyll/jekyll)
-
-
-[jekyll-organization]: https://github.com/jekyll

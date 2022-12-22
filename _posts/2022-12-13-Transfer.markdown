@@ -1,0 +1,32 @@
+---
+layout: post
+title:  "Transfer Release"
+date:   2022-12-22 02:42:11 +0000
+categories: Releases
+---
+
+<i>"he's finally here, performing for you, he's the first member of the DK crew" - Stretch Armstrong</i> 
+<br>
+<i>"Fuck yeaaa" - Hays Holladay</i>
+<br>
+<br>
+![image](https://user-images.githubusercontent.com/38221014/208338988-e1f930d7-459f-4105-a5b0-d04bb49b298b.png)
+<br>
+<br>
+I've been working on this fucking thing on and off for over a year now, you'd think I'd have some form of takeway to write about, maybe a tale of grevious bodily harm via carpal tunnel syndrome, or that time we were putting our pencils in eachothers pencil cases, but, all that comes to mind is that bit in DK Rap where he goes <i>"huh!"</i>
+<br>
+<br>
+Transfer started as an internal tool for my work, to <s>fuck around and find out</s> prototype transfer functions for a waveshaper, without having to actually really understand what is going on mathematically. It ended up being pretty neat [citation needed], but very very crashy, partially due to the impeccable design decision to "just have two jit compilers compiling the same function every time it updates" (which is still in the code because I'm lazy and it's funny), and the unfortunate revelation that `nan` is in fact <b>not</b> a valid y coordinate when drawing the graph. 
+<br>
+That being said, it works surprisingly well, and with the recent addition of the `gpr` registers, and conditionals, I imagine if you know what you're doing it's pretty powerful. For the record, I do not in fact know what I'm doing, but I did turn it into a pretty cursed bitcrusher. Without sounding super self inflatory, or as we say in Ireland, having <i>notions</i>, I think it could actually be an interesting teaching tool, in that there's a certain <i>wow</i> factor in essentially hearing what a mathematical function does, that looking at a graph doesn't give you, it recontextualises trig functions and friends, into something less abstract that you can interact with.
+<br>
+<br>
+Going forward, I'm fully aware that it's kind of a shitshow to enter long functions (and the `~(..., ...)` syntax is pretty janky, but not much I can do about that short of trying to hack exprk..), so I'd like to add some sort of syntax highlighting to the text editor, and maybe enable multiline mode, so it's not one monolithic hell function. Exprtk has a LOT of functions I haven't really dabbled in, so I'm sure I can do some trawling through those docs and find some other novel things to try. It also gave me the idea to do a sister plugin, essentially what Transfer is to distortion but for filters, where you can type in a function, or drag, add and remove poles on a Pole Zero diagram to create the filter, without being able to directly interact with the frequency plot. Possibly more on that in a future post, if it goes anywhere.
+<br>
+In the meantime, would love to hear anything you make with it, and if you have any problems, crashes etc, please do open an issue on [the github](https://github.com/MeijisIrlnd/Transfer) and I'll take a look as soon as I can. 
+<br>
+<br>
+Thanks for reading!!! - Syl
+<br><br>
+[Windows](https://github.com/MeijisIrlnd/Transfer/releases/download/v0.0.1/Transfer-x64.exe) <br>
+[macOS](https://github.com/MeijisIrlnd/Transfer/releases/download/v0.0.1/Transfer.dmg)<br>
