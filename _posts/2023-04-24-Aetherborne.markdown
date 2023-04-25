@@ -19,7 +19,7 @@ A while back I was chatting to Geraint (of Signalsmith fame) about possible appr
 A bit of background, I listen to a lot of rocksteady, dub and roots reggae, and was initially aiming to make a "dub spring" sort of thing, maybe with a way to "twang" the springs as it's playing back, so I 
 I started looking into spectrograms of spring IRs named things like "KingTubbyIR1,wav", to get an idea of what I was even hearing and what gave it its character. 
 
-![img_2.png](img_2.png)
+![image](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/img_1.png)
 
 The pattern here is pretty immediately obvious, what I initially called "hook" shapes losing high end each repeat, layered on top of a bunch of diffuse "wash" 
 (I later found out the "hooks" are usually called <i>chirps</i>, so lets roll with that from now on). It also weirdly kinda looks like a spring if you're creative, and need to get your eyes tested, and don't think about it too hard. 
