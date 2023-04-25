@@ -73,7 +73,13 @@ If we change the distribution of the delay times from "slightly more than the pr
 ![image](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/Chirp.png)
 <br>
 Remember earlier I mentioned that we're treating the STFT as as bank of bandpass filters? What we're doing here is delaying each <i>band</i> by a different amount, which is effectively going to delay the harmonic components of our signal by different amounts.<br><br>
-
+<h2> To chirp or not to chirp </h2>
+Practically with this, I'm still struggling to get the phase twist hellscape to actually sound right, but it <i>does</i> also delay things without it, just not really "correct" as the phases are out of whack. Moving on though, this technique gets you a chirp, which was what I wanted. So following the fourier stuff, back in the time domain, I tried just shoving a datorro plate (more on those bad boys in a later post) onto the output of the ISTFT, and just kinda prayed it would sound good. 
+It did have the spring "twang" but pretty much without any of the other spring stuff (I didn't mention it earlier but there's quite a clear periodic thing going on in the low end of the spring), and I'm sure I could have (and still might at some point) figured it out, but what really jumped out at me was how fucking <i>cool</i> it sounded with long delay times. <br>
+Conceptually, this technique of incrementally increasing delay time is going to be equivalent to doing a sweep from 0 to nyquist with a bandpass filter - the delay time distribution is dictating how the sweep moves, kind of like automatic automation. That in and of itself has a nice "envelope follower" feel to it, but the high end is where the magic happens. <br>
+With an increasing delay time each bin, the highs obviously get delayed by the most, and if you're playing into it you're probably playing continuously, so what you end up with is a cumulative "twinkle" in the high end with an almost windchime quality, at frequencies that are always pretty sympathetic to your input signal. Messing around with the max bin to delay helps a lot, but beware of the 
+<h3> G H O S T D E L A Y </h3> 
+This is very much a juce grievance, and probably not gonna be a very long section, but it pissed me off enough that I feel the need to talk about it. When I was testing the frequency delay stuff, I was finding that after maybe 40 - 60 seconds, a te 
 <br>
   <script>
   MathJax = {
