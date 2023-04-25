@@ -17,7 +17,7 @@ A while back I was chatting to Geraint (of Signalsmith fame) about possible appr
 <br> 
 <br>
 A bit of background, I listen to a lot of rocksteady, dub and roots reggae, and was initially aiming to make a "dub spring" sort of thing, maybe with a way to "twang" the springs as it's playing back, so I 
-I started looking into spectrograms of spring IRs named things like "KingTubbyIR1,wav", to get an idea of what I was even hearing and what gave it its character. 
+I started looking into spectrograms of spring IRs named things like "KingTubbyIR1.wav", to get an idea of what I was even hearing and what gave it its character. 
 
 ![image](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/img_1.png)
 
@@ -37,7 +37,8 @@ instead of a world of boring regular floating point samples, and you can pretty 
 <br>
 <br>
 An aside with this that's still tripping me up, is that while yeah, all thats true, I'm glossing over a step. Secure your socks firmly to your sock receptacles, we're doing <b>`m a t h s`</b>.
-<br><br> 
+<br>
+<h3> The Cha Cha Phase Twist </h3>
 So (and depending on your background with this stuff you might have to trust me here) you can write the formula for an STFT as follows: <br>
 $X_m(\omega_k) = \sum_{-\infty}^{\infty}[x(n)e^{-j\omega_kn}]w(n - m)$
 <br> 
@@ -60,10 +61,17 @@ So combining the two, we can find the phase of a bin with $2\pi (p * H) * (b_i /
 <br>
 <br>
 <br>
-take a breath 
-
-
-<br> 
+take a breath, it's time for
+<h3>The actual delaying</h3>
+Now we've gotten an idea of the underlying workings and practical considerations for this, we can move onto the fun stuff. A regular delay $z^{-n}$ just delays your signal by $n$ samples, so anything that goes in comes out $n$ samples later. The equivalent to this in the frequency domain is to delay each bin by $n$ samples. <br>
+![LinearDelay.png](LinearDelay.png)<br>
+The cool thing about being in the frequency domain though, is that the delay times for each bin don't need to be the same, so by delaying each bin by a slightly higher amount than the previous bin, we can get to this kind of idea:<br>
+![FrequencyDelay.png](FrequencyDelay.png)
+<br>
+If we change the distribution of the delay times from "slightly more than the previous bin's delay time" to "twice the previous bin's delay time", we get this, which is approaching the shape of the chirp we saw in the spring's impulse response earlier. <br>
+![Chirp.png](Chirp.png)
+<br>
+Remember earlier I mentioned that we're treating the STFT as as bank of bandpass filters? What we're doing here is delaying each <i>band</i> by a different amount, which is effectively going to delay the harmonic components of our signal by different amounts.<br><br>
 
 <br>
   <script>
