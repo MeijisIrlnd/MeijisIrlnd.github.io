@@ -42,7 +42,7 @@ So (and depending on your background with this stuff you might have to trust me 
 $H_m(\omega_k) = \sum_{-\infty}^{\infty}[x(n)e^{-j\omega_kn}]w(n - m)$
 <br> 
 So what's going actually going on here? First lets define some terms. $X_m(\omega_k)$ is the spectrum we're producing, $x(n)$ is our time domain signal we want to transform, $e^{-j}$ is the "complex exponential" (euler's number to some imaginary power, $\omega_k$ is a term relating sample rate and fft size, $n$ is a time, $m$ is a delay, and $w(x)$ is our window function. We're essentially repeatedly calculating the DTFT, and then sliding over by `hopSize` samples. 
-<i><sub>side note: from euler's formula, $e^{j\theta} = cos(\theta) + j sin(\theta)$ in the case of the complex exponential, $e^{-j\omegat} = cos(\omegat) + jsin(\omegat)$, there's an argument to be made for writing the entire stft out using sin and cos instead of euler's number, but I digress..</sub></i>
+<i><sub>side note: from euler's formula, $e^{j\theta} = cos(\theta) + j sin(\theta)$ in the case of the complex exponential, $e^{-j\omega t} = cos(\omega t) + jsin(\omega t)$, there's an argument to be made for writing the entire stft out using sin and cos instead of euler's number, but I digress..</sub></i>
 <br><br>take a breath<br><br> 
 Cool, we know roughly what the symbols under the dresser mean, and have ballpark idea of what the stft does, why does this matter? The <b>thing is</b> with this configuration, our signal is being kept constant, and we're sliding a window along it. That's kinda dumb right? This thing is supposed to be realtime. So what we can do instead is rephrase as<br>
 $H_m(\omega_k) = \sum_{-\infty}^{\infty}[x(n + m)e^{-j\omega_kn}]w(n)$
