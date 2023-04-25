@@ -41,7 +41,7 @@ instead of a world of boring regular floating point samples, and you can pretty 
 An aside with this that's still tripping me up, is that while yeah, all thats true, I'm glossing over a step. Secure your socks firmly to your sock receptacles, we're doing <b>`m a t h s`</b>.
 <br><br> 
 So (and depending on your background with this stuff you might have to trust me here) you can write the formula for an STFT as follows:
-![img_4.png](img_4.png)
+$H_m(\omega_k) = \sum_{-\infty}^{\infty}[x(n)e^{-j\omega_kn}]w(n - m)$
 <br> 
 So what's going actually going on here? First lets define some terms. `X_m(wk)` is the spectrum we're producing, `x(n)` is our time domain signal we want to transform, `e^-j` is the "complex exponential" (euler's number to some imaginary power, `w_k` is a term relating sample rate and fft size, `n` is a time, `m` is a delay, and `w(x)` is our window function. We're essentially repeatedly calculating the DTFT, and then sliding over by `hopSize` samples. 
 <br><br>take a breath<br><br> 
