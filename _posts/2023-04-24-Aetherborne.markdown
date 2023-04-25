@@ -32,7 +32,7 @@ So far so good, time to spam Geraint's dm-s with screenshots of spectrograms and
 So STFTs right? Whats up with that? Aren't they just slightly more annoying to think about ways of splitting a signal into sines and cosines, a kind of <i>extra</i> version of a regular fft? That you unfortunately have to use for real time applications?? 
 <br> 
 Well yeah, and straight up I had such a horrible time trying to implement my own that I nabbed Geraint's implementation from his SignalsmithDSP library, threw it all into a single header, and rolled with that instead. 
-The other (and in my opinion much radder) thing about STFTs is that you can think of them as not just sines/cosines, but as a <b>filter bank</b> of N / 2$ bandpass filters, where $N$ is our FFT size, all running at a sample rate of our hop size $H$. All of a sudden you're into a world of <b>bands</b> 
+The other (and in my opinion much radder) thing about STFTs is that you can think of them as not just sines/cosines, but as a <b>filter bank</b> of $N / 2$ bandpass filters, where $N$ is our FFT size, all running at a sample rate of our hop size $H$. All of a sudden you're into a world of <b>bands</b> 
 instead of a world of boring regular floating point samples, and you can pretty much apply any processing there you want, with the caveat of everything now needing to be a complex number for any maths you may need to do. 
 <br>
 <br>
