@@ -32,7 +32,7 @@ So far so good, time to spam Geraint's dm-s with screenshots of spectrograms and
 So STFTs right? Whats up with that? Aren't they just slightly more annoying to think about ways of splitting a signal into sines and cosines, a kind of <i>extra</i> version of a regular fft? That you unfortunately have to use for real time applications?? 
 <br> 
 Well yeah, and straight up I had such a horrible time trying to implement my own that I nabbed Geraint's implementation from his SignalsmithDSP library, threw it all into a single header, and rolled with that instead. 
-The other (and in my opinion much radder) thing about STFTs is that you can think of them as not just sines/cosines, but as a <b>filter bank</b> of `fftSize / 2` bandpass filters, all running at a sample rate of `hopSize`.All of a sudden you're into a world of <b>bands</b> 
+The other (and in my opinion much radder) thing about STFTs is that you can think of them as not just sines/cosines, but as a <b>filter bank</b> of $fftSize / 2$ bandpass filters, all running at a sample rate of $hopSize$. All of a sudden you're into a world of <b>bands</b> 
 instead of a world of boring regular floating point samples, and you can pretty much apply any processing there you want, with the caveat of everything now needing to be a complex number for any maths you may need to do. 
 <br>
 <br>
@@ -54,7 +54,7 @@ So "applying a phase twist" sounds pretty fuckin metal right? So it's pretty dis
 all of this to say that multiplying by $e^{j\theta}$ will <i>spin</i> your value along the unit circle by theta radians. So we're essentially trying to "spin" our bin to DC (the 0th bin's phase) to do our processing, then spin it the exact inverse to get it back to normal. 
 <br><br>
 For example then, lets say we're dealing with a frequency of $0.2 f_s$. We can find its phase using $2\pi b_i 0.2$, where $b_i$ is our bin index. We need to account for hop size here, seeing as we're using an stft which has overlapping and other self-hatred triggering properties. so to link hop size into our phase calculation, we can say that the phase at block number $p$ is $2\pi (p * hopSize) 0.2$ ($p$ increments each hop, just a way of dealing with the overlap). We can get the central frequency of bin $b_i$ with $b_i / fftSize$. 
-So combining the two, we can find the phase of a bin with `2pi * (p * hopSize) * (n / FFTSize)`, lets call that `shift`. SO then to do our phase twist, we can just multiply our value by `exp(-j * shift)`, do our processing, then multiply by `exp(j * shift)` to get back to the original phase. 
+So combining the two, we can find the phase of a bin with $2\pi (p * hopSize) * (n / fftSize)$, lets call that $shift$. SO then to do our phase twist, we can just multiply our value by $e^{-j shift}$, do our processing, then multiply by $e^{j shift}$ to get back to the original phase. 
 <br><br>Here's a horrible drawing to illustrate it:<br>
 ![img_7.png](img_7.png)
 <br>
