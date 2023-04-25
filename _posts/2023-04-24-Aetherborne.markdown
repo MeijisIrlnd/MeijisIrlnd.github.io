@@ -35,15 +35,14 @@ Well yeah, and straight up I had such a horrible time trying to implement my own
 The other (and in my opinion much radder) thing about STFTs is that you can think of them as not just sines/cosines, but as a <b>filter bank</b> of `fftSize / 2` bandpass filters, all running at a sample rate of `hopSize`.All of a sudden you're into a world of <b>bands</b> 
 instead of a world of boring regular floating point samples, and you can pretty much apply any processing there you want, with the caveat of everything now needing to be a complex number for any maths you may need to do. 
 <br>
-<i><sub>side note: from euler's formula, $e^{j\theta} = cos(\theta) + j sin(\theta)$ in the case of the complex exponential, so `exp(-jwt) = cos(wt) - jsin(wt)`, there's an argument to be made for writing the entire stft out using sin and cos instead of euler's number, but I digress..</sub></i>
-<br>
 <br>
 An aside with this that's still tripping me up, is that while yeah, all thats true, I'm glossing over a step. Secure your socks firmly to your sock receptacles, we're doing <b>`m a t h s`</b>.
 <br><br> 
 So (and depending on your background with this stuff you might have to trust me here) you can write the formula for an STFT as follows: <br>
 $H_m(\omega_k) = \sum_{-\infty}^{\infty}[x(n)e^{-j\omega_kn}]w(n - m)$
 <br> 
-So what's going actually going on here? First lets define some terms. $X_m(\omega_k)$ is the spectrum we're producing, `x(n)` is our time domain signal we want to transform, `e^-j` is the "complex exponential" (euler's number to some imaginary power, `w_k` is a term relating sample rate and fft size, `n` is a time, `m` is a delay, and `w(x)` is our window function. We're essentially repeatedly calculating the DTFT, and then sliding over by `hopSize` samples. 
+So what's going actually going on here? First lets define some terms. $X_m(\omega_k)$ is the spectrum we're producing, $x(n)$ is our time domain signal we want to transform, $e^{-j}$ is the "complex exponential" (euler's number to some imaginary power, $\omega_k$ is a term relating sample rate and fft size, $n$ is a time, $m$ is a delay, and $w(x)$ is our window function. We're essentially repeatedly calculating the DTFT, and then sliding over by `hopSize` samples. 
+<i><sub>side note: from euler's formula, $e^{j\theta} = cos(\theta) + j sin(\theta)$ in the case of the complex exponential, $e^{-j\omegat} = cos(\omegat) + jsin(\omegat)$, there's an argument to be made for writing the entire stft out using sin and cos instead of euler's number, but I digress..</sub></i>
 <br><br>take a breath<br><br> 
 Cool, we know roughly what the symbols under the dresser mean, and have ballpark idea of what the stft does, why does this matter? The <b>thing is</b> with this configuration, our signal is being kept constant, and we're sliding a window along it. That's kinda dumb right? This thing is supposed to be realtime. So what we can do instead is rephrase as<br>
 $H_m(\omega_k) = \sum_{-\infty}^{\infty}[x(n + m)e^{-j\omega_kn}]w(n)$
@@ -59,7 +58,6 @@ So combining the two, we can find the phase of a bin with `2pi * (p * hopSize) *
 <br><br>Here's a horrible drawing to illustrate it:<br>
 ![img_7.png](img_7.png)
 <br>
-$test$
 <br>
 <br>
 take a breath 
