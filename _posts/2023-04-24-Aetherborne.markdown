@@ -57,19 +57,20 @@ all of this to say that multiplying by $e^{j\theta}$ will <i>spin</i> your value
 For example then, lets say we're dealing with a frequency of $0.2 f_s$. We can find its phase using $2\pi b_i 0.2$, where $b_i$ is our bin index. We need to account for hop size here, seeing as we're using an stft which has overlapping and other self-hatred triggering properties. so to link hop size into our phase calculation, we can say that the phase at block number $p$ is $2\pi (pH) 0.2$ ($p$ increments each hop, just a way of dealing with the overlap). We can get the central frequency of bin $b_i$ with $b_i / N$. 
 So combining the two, we can find the phase of a bin with $2\pi (p * H) * (b_i / N)$, lets call that $S$, for <b>shift</b>. SO then to do our phase twist, we can just multiply our value by $e^{-j S}$, do our processing, then multiply by $e^{j S}$ to get back to the original phase. 
 <br><br>Here's a horrible drawing to illustrate it:<br>
-![img_7.png](img_7.png)
+![Drawing](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/img_7.png)
 <br>
 <br>
 <br>
 take a breath, it's time for
 <h3>The actual delaying</h3>
 Now we've gotten an idea of the underlying workings and practical considerations for this, we can move onto the fun stuff. A regular delay $z^{-n}$ just delays your signal by $n$ samples, so anything that goes in comes out $n$ samples later. The equivalent to this in the frequency domain is to delay each bin by $n$ samples. <br>
-![LinearDelay.png](LinearDelay.png)<br>
+![LinearDelay](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/LinearDelay.png)
+<br>
 The cool thing about being in the frequency domain though, is that the delay times for each bin don't need to be the same, so by delaying each bin by a slightly higher amount than the previous bin, we can get to this kind of idea:<br>
-![FrequencyDelay.png](FrequencyDelay.png)
+![FrequencyDelay](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/FrequencyDelay.png)
 <br>
 If we change the distribution of the delay times from "slightly more than the previous bin's delay time" to "twice the previous bin's delay time", we get this, which is approaching the shape of the chirp we saw in the spring's impulse response earlier. <br>
-![Chirp.png](Chirp.png)
+![Chirp.png]([Chirp.png](https://raw.githubusercontent.com/MeijisIrlnd/MeijisIrlnd.github.io/master/_posts/Chirp.png))
 <br>
 Remember earlier I mentioned that we're treating the STFT as as bank of bandpass filters? What we're doing here is delaying each <i>band</i> by a different amount, which is effectively going to delay the harmonic components of our signal by different amounts.<br><br>
 
