@@ -87,7 +87,7 @@ The "twinkling" high end idea got me thinking though, it'd be cool to try and is
 Then I started thinking about what would happen if I put a reverb on each band of an STFT, with slightly different params on each, or if I just put reverb on the high bins, etc etc, and got to work prototyping. 
 At the moment it's the frequency delay idea, with a default param datorro reverb on each band, so nothing TOO exciting, but as well as varying the params per band, it'd be cool to try and add some cross feedback between bands (although keeping it stable is probably gonna be the subject of the next post here...).
 <br><br>At any rate, its still early days on it, so I'll sign this off with a clip of it in action<br><br>
-<audio ref='demo' src="https://github.com/MeijisIrlnd/MeijisIrlnd.github.io/blob/master/_posts/FreqDelay_FullDatorro.wav?raw=true" autoPlay loop></audio>
+<audio ref='demo' controls="controls" src="https://github.com/MeijisIrlnd/MeijisIrlnd.github.io/blob/master/_posts/FreqDelay_FullDatorro.wav?raw=true" autoPlay loop></audio>
 
 [FreqDelay_FullDatorro.wav](FreqDelay_FullDatorro.wav) <br><br><br>
 Thanks for reading!!! - Syl
