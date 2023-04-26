@@ -80,8 +80,15 @@ Conceptually, this technique of incrementally increasing delay time is going to 
 With an increasing delay time each bin, the highs obviously get delayed by the most, and if you're playing into it you're probably playing continuously, so what you end up with is a cumulative "twinkle" in the high end with an almost windchime quality, at frequencies that are always pretty sympathetic to your input signal. Messing around with the max bin to delay helps a lot, but beware of the 
 <h3> G H O S T D E L A Y </h3> 
 This is very much a juce grievance, and probably not gonna be a very long section, but it pissed me off enough that I feel the need to talk about it. When I was testing the frequency delay stuff, I was finding that after maybe 40 - 60 seconds, a horrifying spectre would appear behind me and stab me in the neck repeatedly, and also I'd hear super delayed versions of what I played 40 to 60 seconds ago. I was capping the max bin for the delay at $N / 4$, so anything above that bin would have a delay of 0, right?<br> 
-WRONG SO WRONG if you give a `juce::dsp::DelayLine` a delay time of zero, it kinda just delays by however much it wants. I haven't done anything scientific, but I'd ASSUME it's gonna delay by whatever you give it for its `maximumDelayInSamples`. Pretty easy to get around especially as you'll probably have a struct that handles two delay lines at once (one for real, one for imaginary), so you can just get it to return the last pushed sample if its got a delay time of 0, but it's a pretty cool way of gaslighting yourself into thinking you're having auditory hallucinations, so that's cool, thanks for documenting that one.
+WRONG SO WRONG if you give a `juce::dsp::DelayLine` a delay time of zero, it kinda just delays by however much it wants. I haven't done anything scientific, but I'd ASSUME it's gonna delay by whatever you give it for its `maximumDelayInSamples`. Pretty easy to get around especially as you'll probably have a struct that handles two delay lines at once (one for real, one for imaginary), so you can just get it to return the last pushed sample if its got a delay time of 0, but it's a pretty cool way of gaslighting yourself into thinking you're having auditory hallucinations, so that's cool, and totally didn't take me 3 hours to find...
 
+<h2>Aetherborne, and the immaculate conception, or, Twinkle Twinkle Wet Guitar</h2>
+The "twinkling" high end idea got me thinking though, it'd be cool to try and isolate, or at least accentuate that effect, along with some "ambiance" (and by ambiance I definitely just mean reverb).
+Then I started thinking about what would happen if I put a reverb on each band of an STFT, with slightly different params on each, or if I just put reverb on the high bins, etc etc, and got to work prototyping. 
+At the moment it's the frequency delay idea, with a default param datorro reverb on each band, so nothing TOO exciting, but as well as varying the params per band, it'd be cool to try and add some cross feedback between bands (although keeping it stable is probably gonna be the subject of the next post here...).
+<br><br>At any rate, its still early days on it, so I'll sign this off with a clip of it in action<br><br>
+[FreqDelay_FullDatorro.wav](FreqDelay_FullDatorro.wav) <br><br><br>
+Thanks for reading!!! - Syl
 <br>
   <script>
   MathJax = {
