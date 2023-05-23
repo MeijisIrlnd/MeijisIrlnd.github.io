@@ -12,7 +12,7 @@ categories: Releases
 <i>I dreamed a dream and now that dream has gone from me<i> - Stretch Armstrong
 
 <h1>Prologue</h1>
-Of all the audio effects you can write, probably the most mysterious (and possibly gatekept) is a reverb. It's not that the techniques aren't publicised, or that there isn't a vast amount of eye watering literature about it, but there's a lot of hand waving about specifics, and understandably so - someone might spend 6 months tuning delay times, allpass coefficients, whatever, and not want someone to be able to recreate all their work within an hour,  not to mention the corporate overlord factor, Jon Datorro, and his unusually readable and fun series of papers was apparently the subject of a court case by either Ensoniq or Lexicon, for sharing company secrets (if anyone can find the transcript and send it to me I'll buy you a pint). 
+Of all the audio effects you can write, probably the most mysterious (and possibly gatekept) is a reverb. It's not that the techniques aren't publicised, or that there isn't a vast amount of eye watering literature about it, but there's a lot of hand waving about specifics, and understandably so - someone might spend 6 months tuning delay times, allpass coefficients, whatever, and not want someone to be able to recreate all their work within an hour,  not to mention the corporate overlord factor, Jon Dattoro, and his unusually readable and fun series of papers was apparently the subject of a court case by either Ensoniq or Lexicon, for sharing company secrets (if anyone can find the transcript and send it to me I'll buy you a pint). 
 <br>
 So all of this to say, it's pretty hard to know where to start, if you want to write your own, or know how to tweak an existing well defined reverb structure, so first lets take a bit of a dive into 
 
@@ -87,20 +87,20 @@ To summarize then, the mix matrix is there to handle routing between the channel
 <br> 
 ** which turns out to be an identity matrix!
 </sub>
-<h1> Jon Datorro (or in English, "The Raging Bull") </h1>
-Datorro's 1997 paper, ["Effect Design Part 1: Reverberator and Other Filters"](https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf) is pretty unique in tone, walking the metaphorical tightrope between engaging and dense in theory. In it, he details (delay times, coefficients and all) an approach apparently "inspired by" the work of David Griesinger (of Lexicon fame). I've read rumours that the design published in his Effect Design paper was arrived at by reverse engineering one of the Lexicon models (potentially 224, confirmed to be designed by Griesinger), and the tips section of the freeverb site has this to offer: 
+<h1> Jon Dattoro (or in English, "The Raging Bull") </h1>
+Dattoro's 1997 paper, ["Effect Design Part 1: Reverberator and Other Filters"](https://ccrma.stanford.edu/~dattorro/EffectDesignPart1.pdf) is pretty unique in tone, walking the metaphorical tightrope between engaging and dense in theory. In it, he details (delay times, coefficients and all) an approach apparently "inspired by" the work of David Griesinger (of Lexicon fame). I've read rumours that the design published in his Effect Design paper was arrived at by reverse engineering one of the Lexicon models (potentially 224, confirmed to be designed by Griesinger), and the tips section of the freeverb site has this to offer: 
 
 > The room reverb looks just like Griesinger 'plate' reverb covered by the AES paper 'Effect Design - Part 1, Reverberator and other filters'. Except that there is one additional stage of diffusion and one additional stage of delay through each leg of the tank. Also, the placement of the damping low-pass filters are somewhat different. The input diffusion is done differently. Rather than having four cascaded input diffusors, there are two pairs of cascaded diffusors, each feeding one leg of the tank. Both are fed from the predelay line. The output tap summation uses a lot more taps, including some in the predelay. 
 
 <br> 
 Pretty cool. So let's take a look at the structure from the paper (I'm going to skip over the actual coefficients and delay times here, because it doesn't really matter to us - if you want them they're in the paper, but in the dsp equivelent to A=432, they're relative to a sample rate of 29761Hz, so you'll probably want to scale them so they're agnostic to sample rate...).
 <br> 
-So the first thing to discuss here really is the allpass filter structure Datorro uses throughout, because it (visually) diverges from the traditional Schroeder structure, which looks like:
+So the first thing to discuss here really is the allpass filter structure Dattoro uses throughout, because it (visually) diverges from the traditional Schroeder structure, which looks like:
 
 ![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/345217292_2183096888540941_2775037953132022632_n.png?_nc_cat=102&ccb=1-7&_nc_sid=ae9488&_nc_ohc=jYqFx4LsjtEAX8GhqDl&_nc_ht=scontent.fdub3-2.fna&oh=03_AdQ2Mwgz_Dwvmj_IwFX1yggBCqmRTueWCV9ZmOyPP4kdzw&oe=649375A1)
 
 <br>
-A discussion on how allpass filters work is kind of out of the scope of this post and I'm assuming you're familiar with them, (if not probably read into them, but the rough idea is to have a flat frequency response, but many repeats of the input). At any rate, Datorro's structure (which I've seen referred to as a Lattice) looks something like this: 
+A discussion on how allpass filters work is kind of out of the scope of this post and I'm assuming you're familiar with them, (if not probably read into them, but the rough idea is to have a flat frequency response, but many repeats of the input). At any rate, Dattoro's structure (which I've seen referred to as a Lattice) looks something like this: 
 
 ![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/344775654_997132221460303_7047282491001007447_n.png?_nc_cat=100&ccb=1-7&_nc_sid=ae9488&_nc_ohc=MmJtmyRcQLMAX8W9ZCy&_nc_ht=scontent.fdub3-2.fna&oh=03_AdTMbNKwxd0ESbVNkEXd8QjeiMiuNpCP9il4iLxS8edJmg&oe=649392B8)
 
@@ -117,7 +117,7 @@ So to start us off, lets take a closer look at the [tank](https://www.youtube.co
 allpass (inverted) -> delay -> multiply -> lowpass -> allpass -> delay -> multiply
 <br>
 
-What jumps out here, is that the allpass -> delay -> multiply structure appears twice, just seperated by a lowpass (you might notice that one of the allpasses is inverted, so they're not <i>technically</i> identical - we'll get to that in a minute). So let's call that a <i>stage</i>, and our flow becomes: 
+What jumps out here, is that the allpass -> delay -> multiply structure appears twice, just separated by a lowpass (you might notice that one of the allpasses is inverted, so they're not <i>technically</i> identical - we'll get to that in a minute). So let's call that a <i>stage</i>, and our flow becomes: 
 <br>
 <br> 
 stage1 -> lowpass -> stage 2
@@ -130,7 +130,7 @@ While we're at it, let's apply the same process to the other side of the tank, a
 <br>
 <br>
 So here's where things get spicy. Hopefully your mix matrix goggles are still on from earlier on, you're gonna need them. So we established that the purpose of the mix matrix was to control routing between channels in an FDN right? So it follows that in Geraint's architecture, we could (if we wanted to) add unique elements to different channels, like some sort of filtering on channel 1 or some extra multiply on channel 4 or something, and the mix matrix would remain unaffected because <b>it just controls the routing </b>. <br> 
-With this in mind then, let's come up with a mix matrix for our Datorro tank. Because the matrix only affects routing, we can pretend the lowpass between the stages doesn't exist, and also ignore that allpass inversion I mentioned earlier. To write it out then: 
+With this in mind then, let's come up with a mix matrix for our Dattoro tank. Because the matrix only affects routing, we can pretend the lowpass between the stages doesn't exist, and also ignore that allpass inversion I mentioned earlier. To write it out then: 
 <br> 
 <br> 
 Stage 1 feeds Stage 2<br>
@@ -149,24 +149,185 @@ $$ A = \begin{bmatrix}
 \end{bmatrix}
 $$
 
-We now have everything we need to express a Datorro reverb** as an FDN, which would look something like this: 
+We now have everything we need to express a Dattoro reverb** as an FDN, which would look something like this: 
 
 ![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/348355174_809530630690113_3988249740859382156_n.png?stp=dst-png_s2048x2048&_nc_cat=107&ccb=1-7&_nc_sid=ae9488&_nc_ohc=NfU0OdpAIuAAX8Pj67J&_nc_ht=scontent.fdub3-2.fna&oh=03_AdTQuFxDks8u1IupOWNs1mVWjPq69hgHIwSO-UJTk_q8ig&oe=6493AB82)
 
 <br>
-So now we have an FDN identical to a normal Datorro, why bother with all this? 
+So now we have an FDN identical to a normal Dattoro, why bother with all this? We're getting there, but first we have to touch <s>grass</s> base with our old friend, 
 
 <sub>*A bunch of fancy ways to say make it ring at certain frequencies less
 <br>
 **It's worth noting I'm ignoring the output taps completely from the paper, mainly because they're annoying and don't fit into the FDN perspective very neatly, but you totally could just tap off the individual channels at different points if you wanted to
 </sub>
 
-<h1>Gain Paths</h1>
+<h1>Orthogonality</h1>
+The final piece of the puzzle here is understanding orthogonality outside of the run of the mill textbook definition - sure, you could say that a matrix is orthogonal if its column vectors are orthonormal ( $v_1 . v_2 = 0$ ) but to me at least, that's avoiding the actual meaning, which is that an orthogonal matrix (or orthogonal transform, same thing) preserve both a vector's length and the angles between them*. In our case though, the lengths of the vectors can be interpreted as energy. So if our mix matrix is <b>orthogonal</b>, we know that we're neither losing nor gaining energy in this stage. This is important because if our mix matrix ISN'T orthogonal, and say, scales the lengths of the input vector by a factor of 2, every pass through the system, our signal will increase in volume - likewise, if the transform scaled the lengths of the input vector by a factor of 0.5, each pass through the system, the signal will decrease in energy.<br> 
+Decreasing isn't really a problem, other than the fact that it will make our reverb die off quicker**, but obviously it's not a great idea to have a system constantly increasing in volume, that's a recipe for ruptured eardrums and confused doctors. 
+<br> 
+<br> 
+So there's the intuition, but unfortunately you do kinda need to be able to calculate whether a matrix is orthogonal. If this is old news to you, feel free to breeze past this paragraph. <br>
+A matrix A is defined as being orthogonal if $A . A_T = I$, where $A_T$ is the transpose of $A$, and $I$ is an identity matrix (1s on the diagonal top left to bottom right, 0s everywhere else). We can find the transpose of a matrix by writing its rows as it's columns, so writing this out for our dattorro mix matrix: 
 
 
+$$ \begin{bmatrix}
+0 & 1 & 0 & 0\\  
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+.
+\begin{bmatrix}
+0 & 0 & 0 & 1\\  
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & 0 & 0 & 0\\  
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+<br>
+So if this is true, our matrix is orthogonal, and we're happily frolicking through fields of golden dandelions, a light breeze tussling our hair, and our shetland pony whinnying gleefully behind us. So let's multiply it out (if you don't know how to matrix multiply, google is your friend here): 
+
+$$ A.A_T = \begin{bmatrix}
+0(0) + 1(1) + 0(0) + 0(0), & 0(0) + 1(0) + 0(1) + 0(0), & 0(0) + 1(0) + 0(0) + 0(1), & 0(1) + 1(0) + 0(0) + 0(0)\\  
+0(0) + 0(1) + 1(0) + 0(0), & 0(0) + 0(0) + 1(1) + 0(0), & 0(0) + 0(0) + 1(0) + 0(1), & 0(1) + 0(0) + 1(0) + 0(0)\\
+0(0) + 0(1) + 0(0) + 1(0), & 0(0) + 0(0) + 0(1) + 1(0), & 0(0) + 0(0) + 0(0) + 1(1), & 0(1) + 0(0) + 0(0) + 1(0)\\
+1(0) + 0(1) + 0(0) + 0(0), & 1(0) + 0(0) + 0(1) + 0(0), & 1(0) + 0(0) + 0(0) + 0(1), & 1(1) + 0(0) + 0(0) + 0(0)\\
+\end{bmatrix}
+= 
+\begin{bmatrix} 
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+<br><br>
+
+$$ A.A_T = \begin{bmatrix} 
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+= I
+$$
 
 
+<br><br>
+and would you look at that, our mix matrix is orthogonal! A note on $A.A_T=I$ though, so it doesn't come across as a magic abstract idea - If you take for granted that the transpose of a matrix is the matrix's inverse <b>only</b> if the matrix is orthogonal, then what it's saying is that if you multiply a matrix by its transpose, and there's no change, you've essentially done nothing, so the matrix MUST be orthogonal, because its transpose is its inverse. To me this isn't ideal, because it still relies on you just accepting the ground truth about the transpose being the inverse if the matrix is orthogonal, but it's better than just memorizing the formula and throwing it around blindly (if anyone has a better way to think about this, please do get in touch!). So now that's out of the way and the idea of energy preservation is percolating around our skulls, we can jump into
+<br>
 
+
+<sub>
+*Surprisingly, this is the pretty much verbatim description from wikipedia, who'dve thought
+<br>
+**In fact, we could actually take the multiply stage from our Dattorro out of each channel's stage, and replace the 1's in our mix matrix with it, so we'd end up with 
+
+$$ A = \begin{bmatrix}
+0 & k & 0 & 0\\  
+0 & 0 & k & 0\\
+0 & 0 & 0 & k\\
+k & 0 & 0 & 0\\
+\end{bmatrix}$$
+
+<sub>
+for a scalar k in the multiply stage - this would mean that the mix matrix now also handles feedback as well as just routing. In this case, our matrix A is only orthogonal if $k=1$.
+</sub>
+
+<h1>Gain Paths </h1>
+Going back to the figure 8 representation of the Datorro reverberator then, here's our refined look at the tank so you don't have to scroll up: <br>
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/345014357_197524479858731_4013488755138476868_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=1XJTHoGwYJgAX8OPnO7&_nc_ht=scontent.fdub3-2.fna&oh=03_AdSnvS-DzMTxsZ42wtw9ItEOFzES4hOzOYd_hSlEbTPrvg&oe=6493901E)
+<br> 
+Okay, cool. Let's say we want to experiment with this structure, outside of tweaking numbers. We want to try and add some extra connections between our stages, to increase echo density even more. So you might (read - I did) naively just yknow, draw a line between say Stage 3, and Stage 1, like this: 
+<br>
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/343456980_758026736022876_8748337365630798131_n.png?_nc_cat=101&ccb=1-7&_nc_sid=ae9488&_nc_ohc=ehe1oXGbf-cAX84-gMI&_nc_ht=scontent.fdub6-1.fna&oh=03_AdRaojmZUqx2pkoxJGFuxyP0mXY7N5lpfjP_elqevrrzMA&oe=64945CF2)
+<br>
+Now let's write out what gets routed where: <br> 
+Stage 1 feeds Stage 2<br> 
+Stage 2 feeds Stage 3<br> 
+Stage 3 feeds Stage 4 and Stage 1<br>
+Stage 4 feeds Stage 1<br>
+<br>
+or in matrix form: 
+
+$$
+A = \begin{bmatrix} 
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+1 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+$$
+
+<br> 
+Remembering our mix matrix should be orthogonal, or at least never increase the total energy in the system, let's plug it into the $A.A_T=I$ formula: 
+<br>
+
+$$
+A.A_T = \begin{bmatrix} 
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+1 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+. 
+\begin{bmatrix} 
+0 & 0 & 1 & 1\\
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\end{bmatrix}
+=
+\begin{bmatrix} 
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix} ?
+$$
+
+<br>
+<br>
+
+$$ 
+\begin{bmatrix} 
+0(0) + 1(1) + 0(0) + 0(0), & 0(0) + 1(0) + 0(1) + 0(0), & 0(1) + 1(0) + 0(0) + 0(1), & 0(1) + 1(0) + 0(0) + 0(0)\\
+0(0) + 0(1) + 1(0) + 0(0), & 0(0) + 0(0) + 1(1) + 0(0), & 0(1) + 0(0) + 1(0) + 0(1), & 0(1) + 0(0) + 1(0) + 0(0)\\
+1(0) + 0(1) + 0(0) + 1(0), & 1(0) + 0(0) + 0(1) + 1(0), & 1(1) + 0(0) + 0(0) + 1(1), & 1(1) + 0(0) + 0(0) + 1(0)\\
+1(0) + 0(1) + 0(0) + 0(0), & 1(0) + 0(0) + 0(1) + 0(0), & 1(1) + 0(0) + 0(0) + 0(1), & 1(1) + 0(0) + 0(0) + 0(0)\\
+\end{bmatrix}
+=
+\begin{bmatrix} 
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 2 & 2\\
+0 & 0 & 1 & 1\\
+\end{bmatrix}
+!= 
+\begin{bmatrix} 
+1 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+
+$$
+
+<br> 
+<br> 
+So that's not very <s>cash money</s> orthogonal looking, is it? 
+
+<br>
+<br>
   <script>
   MathJax = {
     tex: {inlineMath: [['$', '$']]}
