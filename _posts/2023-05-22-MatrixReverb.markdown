@@ -92,6 +92,80 @@ Datorro's 1997 paper, ["Effect Design Part 1: Reverberator and Other Filters"](h
 
 > The room reverb looks just like Griesinger 'plate' reverb covered by the AES paper 'Effect Design - Part 1, Reverberator and other filters'. Except that there is one additional stage of diffusion and one additional stage of delay through each leg of the tank. Also, the placement of the damping low-pass filters are somewhat different. The input diffusion is done differently. Rather than having four cascaded input diffusors, there are two pairs of cascaded diffusors, each feeding one leg of the tank. Both are fed from the predelay line. The output tap summation uses a lot more taps, including some in the predelay. 
 
+<br> 
+Pretty cool. So let's take a look at the structure from the paper (I'm going to skip over the actual coefficients and delay times here, because it doesn't really matter to us - if you want them they're in the paper, but in the dsp equivelent to A=432, they're relative to a sample rate of 29761Hz, so you'll probably want to scale them so they're agnostic to sample rate...).
+<br> 
+So the first thing to discuss here really is the allpass filter structure Datorro uses throughout, because it (visually) diverges from the traditional Schroeder structure, which looks like:
+
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/345217292_2183096888540941_2775037953132022632_n.png?_nc_cat=102&ccb=1-7&_nc_sid=ae9488&_nc_ohc=jYqFx4LsjtEAX8GhqDl&_nc_ht=scontent.fdub3-2.fna&oh=03_AdQ2Mwgz_Dwvmj_IwFX1yggBCqmRTueWCV9ZmOyPP4kdzw&oe=649375A1)
+
+<br>
+A discussion on how allpass filters work is kind of out of the scope of this post and I'm assuming you're familiar with them, (if not probably read into them, but the rough idea is to have a flat frequency response, but many repeats of the input). At any rate, Datorro's structure (which I've seen referred to as a Lattice) looks something like this: 
+
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/344775654_997132221460303_7047282491001007447_n.png?_nc_cat=100&ccb=1-7&_nc_sid=ae9488&_nc_ohc=MmJtmyRcQLMAX8W9ZCy&_nc_ht=scontent.fdub3-2.fna&oh=03_AdTMbNKwxd0ESbVNkEXd8QjeiMiuNpCP9il4iLxS8edJmg&oe=649392B8)
+
+<br>
+If you follow the gain paths, they wind up being identical, just drawn kinda differently, but I thought it was worth mentioning so we're all on the same page, plus I spent fucking ages on excalidraw trying to make them look nice before I started writing and would have been remissed if I didn't include them somewhere... 
+<br>
+So onto the full architecture: 
+
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/342957672_788762955982356_6427743591286414490_n.png?stp=dst-png_p1080x2048&_nc_cat=106&ccb=1-7&_nc_sid=ae9488&_nc_ohc=ohooLXBdRRAAX9grBlg&_nc_ht=scontent.fdub3-2.fna&oh=03_AdRdbseeS8m8qHy88btD073T6FtzooXQlDkjkfaVSJ049Q&oe=64938B66)
+
+It looks like a spaghetti nightmare (or a conchigle catastrophe) but it's actually pretty straightforward. We can roughly break it into an "input" section (pre delay and input lowpass), an input diffuser stage for initial echo density, and a tank stage, for propagating the increasingly dense echoes around the tank. I didn't add it in my diagram, but some of the delay lines are modulated (which is said to "space the eigentones" - increasing (or at least giving the illusion of increasing) mode density*). 
+<br> 
+So to start us off, lets take a closer look at the [tank](https://www.youtube.com/watch?v=EL-D9LrFJd4&themeRefresh=1). The tank can be subdivided into two symmetrical <i>sides</i> (supposedly inspired by the legs on a physical plate). Each <i>side</i> is then set up as follows: <br><br>
+allpass (inverted) -> delay -> multiply -> lowpass -> allpass -> delay -> multiply
+<br>
+
+What jumps out here, is that the allpass -> delay -> multiply structure appears twice, just seperated by a lowpass (you might notice that one of the allpasses is inverted, so they're not <i>technically</i> identical - we'll get to that in a minute). So let's call that a <i>stage</i>, and our flow becomes: 
+<br>
+<br> 
+stage1 -> lowpass -> stage 2
+<br>
+<br>
+While we're at it, let's apply the same process to the other side of the tank, and we're left with: 
+<br>
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/345014357_197524479858731_4013488755138476868_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=1XJTHoGwYJgAX8OPnO7&_nc_ht=scontent.fdub3-2.fna&oh=03_AdSnvS-DzMTxsZ42wtw9ItEOFzES4hOzOYd_hSlEbTPrvg&oe=6493901E)
+
+<br>
+<br>
+So here's where things get spicy. Hopefully your mix matrix goggles are still on from earlier on, you're gonna need them. So we established that the purpose of the mix matrix was to control routing between channels in an FDN right? So it follows that in Geraint's architecture, we could (if we wanted to) add unique elements to different channels, like some sort of filtering on channel 1 or some extra multiply on channel 4 or something, and the mix matrix would remain unaffected because <b>it just controls the routing </b>. <br> 
+With this in mind then, let's come up with a mix matrix for our Datorro tank. Because the matrix only affects routing, we can pretend the lowpass between the stages doesn't exist, and also ignore that allpass inversion I mentioned earlier. To write it out then: 
+<br> 
+<br> 
+Stage 1 feeds Stage 2<br>
+Stage 2 feeds Stage 3<br> 
+Stage 3 feeds Stage 4<br> 
+Stage 4 feeds Stage 1<br>
+<br>
+<br>
+So let's express that as a matrix, using the output column and input row idea from earlier on: <br>
+
+$$ A = \begin{bmatrix}
+0 & 1 & 0 & 0\\  
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+$$
+
+We now have everything we need to express a Datorro reverb** as an FDN, which would look something like this: 
+
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/348355174_809530630690113_3988249740859382156_n.png?stp=dst-png_s2048x2048&_nc_cat=107&ccb=1-7&_nc_sid=ae9488&_nc_ohc=NfU0OdpAIuAAX8Pj67J&_nc_ht=scontent.fdub3-2.fna&oh=03_AdTQuFxDks8u1IupOWNs1mVWjPq69hgHIwSO-UJTk_q8ig&oe=6493AB82)
+
+<br>
+So now we have an FDN identical to a normal Datorro, why bother with all this? 
+
+<sub>*A bunch of fancy ways to say make it ring at certain frequencies less
+<br>
+**It's worth noting I'm ignoring the output taps completely from the paper, mainly because they're annoying and don't fit into the FDN perspective very neatly, but you totally could just tap off the individual channels at different points if you wanted to
+</sub>
+
+<h1>Gain Paths</h1>
+
+
+
+
 
   <script>
   MathJax = {
