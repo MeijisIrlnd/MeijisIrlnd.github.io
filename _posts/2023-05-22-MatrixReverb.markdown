@@ -54,9 +54,9 @@ Cool so what is that actually doing? In Geraint's article, the purpose of that m
 <br>
 <br>
 
-To express this as a matrix, lets take a leap of faith, and label our columns as the outputs for our channels, and our rows as the inputs for our channels. Let's also fill in an x for the input we want our output routed to, and an O for the other slots - in this case, we know that we want the output of channel 1 routed to the input of channel 1, the output of channel 2 routed to the input of channel 2, etc. So we end up with the most one sided game of connect four the world has ever encountered: 
+To express this as a matrix, lets take a leap of faith, and label our columns as the inputs for our channels, and our rows as the ioutputs for our channels. Let's also fill in an x for the input we want our output routed to, and an O for the other slots - in this case, we know that we want the output of channel 1 routed to the input of channel 1, the output of channel 2 routed to the input of channel 2, etc. So we end up with the most one sided game of connect four the world has ever encountered: 
 <br>
-![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/343747352_121047027657542_7977978219463630559_n.png?_nc_cat=101&ccb=1-7&_nc_sid=ae9488&_nc_ohc=ilWm39DGpGkAX-0UATx&_nc_ht=scontent.fdub3-2.fna&oh=03_AdTDrI63M9TY6BwBtTF5lLweCONSVHXYF-512q9CRIgtTA&oe=6493656E)
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348366997_1328079558127045_7166597643537373792_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=gVt2I5R9E6cAX-v0Aw9&_nc_ht=scontent.fdub6-1.fna&oh=03_AdR5ztQZtGleGcJBILYG8ST2wL4dCD-Hgp_caDDDPL7BgA&oe=64963408)
 <br>
 
 Now, lets switch from the nice graphics to inline maths, and replace our X's with 1s and our O's with 0s: 
@@ -75,7 +75,7 @@ That matrix in and of itself isn't very interesting, it just keeps all our chann
 <br> 
 So let's put our labelling goggles on and go back to the 4x4 householder matrix from Geraint's algorithm: 
 <br>
-![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/345027210_3063068820661454_4315982669073535712_n.png?_nc_cat=102&ccb=1-7&_nc_sid=ae9488&_nc_ohc=H2dbP0-WFv8AX_20R5p&_nc_ht=scontent.fdub3-2.fna&oh=03_AdSWTliofkDNPs9ZTPQxvAqSWLaBBprY8dgSOrqNo2TbWQ&oe=64938005)
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348357908_1314520445824633_56406729294710784_n.png?_nc_cat=102&ccb=1-7&_nc_sid=ae9488&_nc_ohc=brlLv56GRq0AX8TOgPZ&_nc_ht=scontent.fdub6-1.fna&oh=03_AdQPP5fryYbb1CU7BjTz2O7jE2BdpHgymt7s3TMwIRQ4qQ&oe=64961BA2)
 
 <br>
 Following the diagonal from the top left to the bottom right, you can see the same structure as our shitty little independent channel matrix, but the 0s have been replaced by -1s. So effectively, it's routing each output to each other channel's input, but flipping the sign. The entire structure is also multiplied by $\frac{1}{2}$ presumably to preserve orthogonality (which I'll get to in a second..)
@@ -162,12 +162,12 @@ So now we have an FDN identical to a normal Dattoro, why bother with all this? W
 </sub>
 
 <h1>Orthogonality</h1>
-The final piece of the puzzle here is understanding orthogonality outside of the run of the mill textbook definition - sure, you could say that a matrix is orthogonal if its column vectors are orthonormal ( $v_1 . v_2 = 0$ ) but to me at least, that's avoiding the actual meaning, which is that an orthogonal matrix (or orthogonal transform, same thing) preserve both a vector's length and the angles between them*. In our case though, the lengths of the vectors can be interpreted as energy. So if our mix matrix is <b>orthogonal</b>, we know that we're neither losing nor gaining energy in this stage. This is important because if our mix matrix ISN'T orthogonal, and say, scales the lengths of the input vector by a factor of 2, every pass through the system, our signal will increase in volume - likewise, if the transform scaled the lengths of the input vector by a factor of 0.5, each pass through the system, the signal will decrease in energy.<br> 
+The final piece of the puzzle here is understanding orthogonality. There's a lot of intricacy here, but the property we really care about right now is the fact that an orthogonal matrix (or orthogonal transform, same thing) preserve both a vector's length and the angles between them*. In our case, the lengths of the vectors can be interpreted as energy. So if our mix matrix is <b>orthogonal</b>, we know that we're neither losing nor gaining energy in this stage. This is important because if our mix matrix ISN'T orthogonal, and say, scales the lengths of the input vector by a factor of 2, every pass through the system, our signal will increase in volume - likewise, if the transform scaled the lengths of the input vector by a factor of 0.5, each pass through the system, the signal will decrease in energy.<br> 
 Decreasing isn't really a problem, other than the fact that it will make our reverb die off quicker**, but obviously it's not a great idea to have a system constantly increasing in volume, that's a recipe for ruptured eardrums and confused doctors. 
 <br> 
 <br> 
 So there's the intuition, but unfortunately you do kinda need to be able to calculate whether a matrix is orthogonal. If this is old news to you, feel free to breeze past this paragraph. <br>
-A matrix A is defined as being orthogonal if $A . A_T = I$, where $A_T$ is the transpose of $A$, and $I$ is an identity matrix (1s on the diagonal top left to bottom right, 0s everywhere else). We can find the transpose of a matrix by writing its rows as it's columns, so writing this out for our dattorro mix matrix: 
+A matrix A is defined as being orthogonal if $A . A^T = I$, where $A^T$ is the transpose of $A$, and $I$ is an identity matrix (1s on the diagonal top left to bottom right, 0s everywhere else). We can find the transpose of a matrix by writing its rows as it's columns, so writing this out for our dattorro mix matrix: 
 
 
 $$ \begin{bmatrix}
@@ -195,7 +195,7 @@ $$
 <br>
 So if this is true, our matrix is orthogonal, and we're happily frolicking through fields of golden dandelions, a light breeze tussling our hair, and our shetland pony whinnying gleefully behind us. So let's multiply it out (if you don't know how to matrix multiply, google is your friend here): 
 
-$$ A.A_T = \begin{bmatrix}
+$$ A.A^T = \begin{bmatrix}
 0(0) + 1(1) + 0(0) + 0(0), & 0(0) + 1(0) + 0(1) + 0(0), & 0(0) + 1(0) + 0(0) + 0(1), & 0(1) + 1(0) + 0(0) + 0(0)\\  
 0(0) + 0(1) + 1(0) + 0(0), & 0(0) + 0(0) + 1(1) + 0(0), & 0(0) + 0(0) + 1(0) + 0(1), & 0(1) + 0(0) + 1(0) + 0(0)\\
 0(0) + 0(1) + 0(0) + 1(0), & 0(0) + 0(0) + 0(1) + 1(0), & 0(0) + 0(0) + 0(0) + 1(1), & 0(1) + 0(0) + 0(0) + 1(0)\\
@@ -212,7 +212,7 @@ $$
 
 <br><br>
 
-$$ A.A_T = \begin{bmatrix} 
+$$ A.A^T = \begin{bmatrix} 
 1 & 0 & 0 & 0\\
 0 & 1 & 0 & 0\\
 0 & 0 & 1 & 0\\
@@ -223,7 +223,7 @@ $$
 
 
 <br><br>
-and would you look at that, our mix matrix is orthogonal! A note on $A.A_T=I$ though, so it doesn't come across as a magic abstract idea - If you take for granted that the transpose of a matrix is the matrix's inverse <b>only</b> if the matrix is orthogonal, then what it's saying is that if you multiply a matrix by its transpose, and there's no change, you've essentially done nothing, so the matrix MUST be orthogonal, because its transpose is its inverse. To me this isn't ideal, because it still relies on you just accepting the ground truth about the transpose being the inverse if the matrix is orthogonal, but it's better than just memorizing the formula and throwing it around blindly (if anyone has a better way to think about this, please do get in touch!). So now that's out of the way and the idea of energy preservation is percolating around our skulls, we can jump into
+and would you look at that, our mix matrix is orthogonal! A note on $A.A^T=I$ though, so it doesn't come across as a magic abstract idea - If you take for granted that the transpose of a matrix is the matrix's inverse <b>only</b> if the matrix is orthogonal, then what it's saying is that if you multiply a matrix by its transpose, and there's no change, you've essentially done nothing, so the matrix MUST be orthogonal, because its transpose is its inverse. You can also prove that $|v| = |Av|$, and essentially work it out backwards, if you're into that kinda thing and don't mind wading through some maths, here's a [link](https://sites.math.rutgers.edu/~cherlin/Courses/250/Lectures/250L26.html). So now that's out of the way and the idea of energy preservation is percolating around our skulls, we can jump into
 <br>
 
 
@@ -269,11 +269,11 @@ A = \begin{bmatrix}
 $$
 
 <br> 
-Remembering our mix matrix should be orthogonal, or at least never increase the total energy in the system, let's plug it into the $A.A_T=I$ formula: 
+Remembering our mix matrix should be orthogonal, or at least never increase the total energy in the system, let's plug it into the $A.A^T=I$ formula: 
 <br>
 
 $$
-A.A_T = \begin{bmatrix} 
+A.A^T = \begin{bmatrix} 
 0 & 1 & 0 & 0\\
 0 & 0 & 1 & 0\\
 1 & 0 & 0 & 1\\
@@ -324,10 +324,232 @@ $$
 
 <br> 
 <br> 
-So that's not very <s>cash money</s> orthogonal looking, is it? 
+That's not very <s>cash money</s> orthogonal looking, is it? So we know it's not orthogonal, how do we know whether it's increasing or decreasing our input? (Looking at the resulting $A.A^T$ product, it's kinda intuitive to me that it will increase the system's energy, but for the sake of completeness..) The easiest way is probably just to send an impulse through the original matrix, and see what happens to it*: 
+<br>
+<br> 
+
+$$
+\begin{vmatrix}
+1\\
+1\\
+1\\
+1\\
+\end{vmatrix} .
+
+\begin{bmatrix} 
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+1 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix} = 
+\begin{vmatrix}
+1\\
+1\\
+2\\
+1\\
+\end{vmatrix}
+$$
 
 <br>
+It's pretty clear that the impulse has grown, because one of our channels has increased - keep in mind what this means for our reverb, it means every pass through the mix matrix the energy of that channel will increase - we probably don't want that. So what can we do to circumvent that?**<br> 
+Well the problem is obviously that one channel's output is getting sent to two channels, right? So what if there was a way to balance that somehow? 
 <br>
+<br>
+<sub>
+*I was looking into other ways to prove this, (and by looking into I mean asking in [TAP](https://discord.gg/FxZ7znZ4)) - The idea of finding the operator norm of the matrix was suggested by Glowcoil (if you're reading this thanks Glowcoil xxx) in there, who gave me an incredibly patient walkthrough of some of these ideas. I figured it was probably a bit too much for this article (just to prove a point), but the idea is, the operator norm will give you the maximum factor a transform can stretch (or compress) your input vector by. Which is pretty much ideal, but to find said operator norm, you first need to find the eigenvalues of $A.A^T$ for your matrix $A$, which you can do by saying $det(A.A^T - \lambda I) = 0$, where $\lambda$ is an eigenvalue. This is doable, it's just with a 4x4, finding the determinant is pretty annoying and time consuming. Once you have your eigenvalues, find the highest one, $\lambda_N$, and your operator norm $||A|| = \sqrt{\lambda_N}$. For an orthogonal matrix, this is intuitively 1, seeing as $||v|| = ||Av||$ if A is orthogonal. So if your operator norm is bigger than 1, the transform is going to increase the energy of the input vector. If it's less than 1, it will decrease the energy of the input vector.
+<br>
+<br>
+**Incidentally, that's the question that started the chain of events that led me to writing this article - I wanted to throw an extra gain path into a Dattoro to see what would happen. Geraint's solution, as usual, was super elegant and inspired this whole FDN perspective shift approach to reverb, thank you Geraint xxx. 
+</sub>
+<h1><s>The Wii Fit balance board</s> Orthogonal Transforms</h1>
+Back to our idea of orthogonality, remember that it preserves the lengths of the input vector (and by extension, in our case, the input signal's energy). We need a way to somehow keep the matrix orthogonal, while adding extra paths to it. One way to do that is with orthogonal transforms, which sound scary, but really are things like rotation*, and reflection. So let's take a look at a 2d rotation matrix: 
+<br>
+<br>
+
+$$R_\theta = \begin{bmatrix} 
+ \phantom{-}  cos{\theta} & sin{\theta}\\
+ -sin{\theta} & cos{\theta}\\
+ \end{bmatrix}
+$$
+
+<br>
+Armed with the knowledge that this is orthogonal, let's try plugging this into the original Dattoro mix matrix, representing $cos{\theta}$ as $c$, and $sin{\theta}$ as $s$.
+<br>
+
+$$ \begin{bmatrix}
+0 & c & s & 0\\  
+0 & -s & c & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+$$
+
+<br> 
+Notice, by the way, that I embedded the rotation matrix so it replaced a 1 from each row of the mix matrix, so it wasn't just adding energy, it replaces those elements. I'll spare you the matrix multiplication on this, but you know the drill, check for orthogonality: 
+<br> 
+<br>
+
+$$ \begin{bmatrix}
+0 & c & s & 0\\  
+0 & -s & c & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+.
+\begin{bmatrix} 
+0 & 0 & 0 & 1\\
+c & -s & 0 & 0\\
+s & c & 0 & 0\\
+0 & 0 & 1 & 0\\
+\end{bmatrix}
+
+=
+
+\begin{bmatrix} 
+c^2 + s^2 & 0 & 0 & 0\\
+0 & s^2 + c^2 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+<br>
+Is this orthogonal? It is if $c^2 + s^2 = 1$. In OTHER WORDS, our addition to the matrix worked, provided the squares of the new coefficients neatly sum to 1. And it just so happens, that a property of sines and cosines is that their squares sum to 1. Neat right? So in practice, what is this doing? Well now, we can say that: <br> 
+Stage 1 feeds Stage 2 with a value of c, and Stage 3 with a value of s. <br> 
+Stage 2 feeds itself, with a value of -s, and Stage 3 with a value of c. <br>
+Stage 3 feeds Stage 4. <br> 
+Stage 4 feeds Stage 1 <br> 
+<br>
+So in image form: 
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348372990_589367639957781_6793205839066917044_n.png?_nc_cat=100&ccb=1-7&_nc_sid=ae9488&_nc_ohc=65HwyEwLiDsAX-TuFtx&_nc_ht=scontent.fdub6-1.fna&oh=03_AdQld42GaoR7Nyz8m8B9kE5Bam1SL_xUeh1J04b92xqpCQ&oe=64965438)
+<br>
+Now we're <s>fuckin'</s> truckin'. There's no need to limit ourselves to 2d rotation matrices here, we could throw in a 3d one to really start to <b><i>feel something</i></b>. Take this funny little character for example: 
+<br> 
+![image](https://ih1.redbubble.net/image.4673004017.2348/st,small,507x507-pad,600x600,f8f8f8.jpg)
+<br>
+Shit, how did he get there? He's got sunglasses on. Let's try that again. Take this funny little character for example: 
+<br> 
+
+$$ R_\theta = 
+\begin{bmatrix} 
+cos{\theta} & 0 & sin{\theta}\\
+0 & 1 & 0\\
+-sin{\theta} & 0 & cos{\theta}\\
+\end{bmatrix}
+$$
+
+<br> 
+Let's embed, baby!
+<br>
+
+$$ \begin{bmatrix} 
+0 & c & 0 & s\\
+0 & 0 & 1 & 0\\
+0 & -s & 0 & c\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+$$
+
+<br>
+You guessed it, let's check for orthogonality: 
+<br> 
+
+$$ \begin{bmatrix} 
+0 & c & 0 & s\\
+0 & 0 & 1 & 0\\
+0 & -s & 0 & c\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+.
+\begin{bmatrix} 
+0 & 0 & 0 & 1\\
+c & 0 & -s & 0\\
+0 & 1 & 0 & 0\\
+s & 0 & c & 0\\
+\end{bmatrix}
+= 
+\begin{bmatrix}
+c^2 + s^2 & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & s^2 + c^2 & 0\\
+0 & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+<br>
+Who could have possibly seen that coming? So in this case, in diagram form, we get: 
+<br> 
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348367100_282880790833122_5438943096772146591_n.png?_nc_cat=111&ccb=1-7&_nc_sid=ae9488&_nc_ohc=qM_V61nZ5DQAX_NHBdR&_nc_ht=scontent.fdub6-1.fna&oh=03_AdT1uppFprYXiBfZA_pyc5V1doP8lnkPP_UIN6b68lY3UQ&oe=64962475)
+<br>
+It's worth noting I plugged these matrices in to kinda random places where they happened to slot in neatly, but it's possible to approach this a little more deliberately (and space the new gain paths apart further) by padding rotation matrices out to however many dimensions you want. For example, if I wanted to construct a rotation matrix to embed, wide enough that it could route channel 1 to channel 4, we can take our 3d rotation matrix which we were using(which is a y axis rotation, by the way, there are a couple more), and just sort of keep adding 1s on the diagonal. So that would look something like this: 
+<br> 
+
+$$ 
+\begin{bmatrix} 
+cos{\theta} & 0 & sin{\theta}\\
+0 & 1 & 0\\
+-sin{\theta} & 0 & cos{\theta}\\
+\end{bmatrix}
+\Rightarrow
+\begin{bmatrix}
+cos{\theta} & 0 & 0 & sin{\theta}\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-sin{\theta} & 0 & 0 & cos{\theta}\\
+\end{bmatrix}
+$$
+
+<br>
+and the orthogonality holds for the transform, so we can safely embed it wherever we want really, for whatever routing we want, just making sure we don't have two 1s in the same row / column. Embedding this to route channel 1 to channel 4 for example, is equivalent to just replacing our entire matrix with that rotation matrix, as they're both 4x4: 
+<br>
+
+$$
+\begin{bmatrix}
+c & 0 & 0 & s\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-s & 0 & 0 & c\\
+\end{bmatrix}
+$$
+
+<br>
+The problem being, a weird side effect of doing that is that Stages 2 and 3 are now independent (the simple delay/feedback structure we discussed earlier), seeing as they only feedback into themselves, leaving our structure looking like this: <br> 
+
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/343766540_6353997581346473_4410611395961735661_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=jyBltcG2ue8AX9psHwG&_nc_ht=scontent.fdub6-1.fna&oh=03_AdRFt0jgyrHz1UTpnqHygl98NngNErveBOisiEYZcJ3NTA&oe=64962878) 
+<br>
+Which is pretty bizarre, but yknow, maybe it sounds great??? 
+<br> 
+
+ Another thing I wanted to mention is that it's fine to embed your matrix in a way that goes beyond the edge of the existing matrix, you'll just have to wrap it around (this is easier to explain by just demonstrating, embedding our new 4d rotation matrix starting at column 1, row 0 into our Dattoro mix matrix): 
+<br>
+
+$$
+\begin{bmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+\Rightarrow
+\begin{bmatrix}
+s & c & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+c & -s & 0 & 0\\
+\end{bmatrix}
+$$
+
+<br> 
+![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/343286905_596565702454320_9015308588758288603_n.png?_nc_cat=104&ccb=1-7&_nc_sid=ae9488&_nc_ohc=4d_Sj6pxiScAX_py5Ll&_nc_ht=scontent.fdub6-1.fna&oh=03_AdRsi20r6hv50KCIXaHV6YF9-A8fzywv_oVicU8kyZMu1g&oe=64962299)
+
+<br>
+Orthogonality holds, we've got some extra routings, and we know that the system is still stable. As I mentioned earlier, you can <s>fuck around and find out</s> experiment with reflections, combining reflections and rotations, combining rotations on multiple axes, etc etc, the world is your metaphorical oyster, and it's pearl season. 
+
+<sub>
+*It's kind of intuitive that a rotation preserves the lengths of the input vector by the way if you think about it
+</sub>
+<br>
+<h1>The long goodbye</h1>
   <script>
   MathJax = {
     tex: {inlineMath: [['$', '$']]}
