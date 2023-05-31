@@ -54,7 +54,7 @@ Cool so what is that actually doing? In Geraint's article, the purpose of that m
 <br>
 <br>
 
-To express this as a matrix, lets take a leap of faith, and label our columns as the inputs for our channels, and our rows as the ioutputs for our channels. Let's also fill in an x for the input we want our output routed to, and an O for the other slots - in this case, we know that we want the output of channel 1 routed to the input of channel 1, the output of channel 2 routed to the input of channel 2, etc. So we end up with the most one sided game of connect four the world has ever encountered: 
+To express this as a matrix, lets take a leap of faith, and label our columns as the inputs for our channels, and our rows as the outputs for our channels. Let's also fill in an x for the input we want our output routed to, and an O for the other slots - in this case, we know that we want the output of channel 1 routed to the input of channel 1, the output of channel 2 routed to the input of channel 2, etc. So we end up with the most one sided game of connect four the world has ever encountered: 
 <br>
 ![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348366997_1328079558127045_7166597643537373792_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=gVt2I5R9E6cAX-v0Aw9&_nc_ht=scontent.fdub6-1.fna&oh=03_AdR5ztQZtGleGcJBILYG8ST2wL4dCD-Hgp_caDDDPL7BgA&oe=64963408)
 <br>
