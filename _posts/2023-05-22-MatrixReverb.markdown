@@ -151,10 +151,10 @@ $$
 
 We now have everything we need to express a Dattoro reverb** as an FDN, which would look something like this: 
 
-![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/348355174_809530630690113_3988249740859382156_n.png?stp=dst-png_s2048x2048&_nc_cat=107&ccb=1-7&_nc_sid=ae9488&_nc_ohc=NfU0OdpAIuAAX8Pj67J&_nc_ht=scontent.fdub3-2.fna&oh=03_AdTQuFxDks8u1IupOWNs1mVWjPq69hgHIwSO-UJTk_q8ig&oe=6493AB82)
+![image](https://scontent.fdub3-2.fna.fbcdn.net/v/t1.15752-9/348391645_1315791545952156_5195099518139566068_n.png?_nc_cat=101&ccb=1-7&_nc_sid=ae9488&_nc_ohc=V5bh6Inti_MAX8tL-Pf&_nc_ht=scontent.fdub3-2.fna&oh=03_AdRL_GZGNY3j4h1Iwlbuur9Ci8dOiWu5H8GcygLPLGSLdw&oe=649E194E)
 
 <br>
-So now we have an FDN identical to a normal Dattoro, why bother with all this? We're getting there, but first we have to touch <s>grass</s> base with our old friend, 
+So now we have an FDN identical to a normal Dattoro, and this technique will work for any allpass/delay structure (if you're feeling adventurous and want some hands on matrix fun (that isn't a Neo, Morpheus and Trinity fanfic like the usual hands on fun you have with the matrix probably), give it a try with [this](http://www.spinsemi.com/images/knowledge_base_img/REV_algo.jpg) structure from [Spin Semiconductor](http://www.spinsemi.com/knowledge_base/effects.html#Reverberation)), but what if we want to add some connections to it? First we need to touch <s>grass</s> base with our good pal,
 
 <sub>*A bunch of fancy ways to say make it ring at certain frequencies less
 <br>
@@ -223,7 +223,7 @@ $$
 
 
 <br><br>
-and would you look at that, our mix matrix is orthogonal! A note on $A.A^T=I$ though, so it doesn't come across as a magic abstract idea - If you take for granted that the transpose of a matrix is the matrix's inverse <b>only</b> if the matrix is orthogonal, then what it's saying is that if you multiply a matrix by its transpose, and there's no change, you've essentially done nothing, so the matrix MUST be orthogonal, because its transpose is its inverse. You can also prove that $|v| = |Av|$, and essentially work it out backwards, if you're into that kinda thing and don't mind wading through some maths, here's a [link](https://sites.math.rutgers.edu/~cherlin/Courses/250/Lectures/250L26.html). So now that's out of the way and the idea of energy preservation is percolating around our skulls, we can jump into
+and would you look at that, our mix matrix is orthogonal! A note on $A.A^T=I$ though, so it doesn't come across as a magic abstract idea - If you take for granted that the transpose of a matrix is the matrix's inverse <b>only</b> if the matrix is orthogonal, then what it's saying is that if you multiply a matrix by its transpose, and there's no change, you've essentially done nothing, so the matrix MUST be orthogonal, because its transpose is its inverse. You can also prove that $||v|| = ||Av||$, and essentially work it out backwards, if you're into that kinda thing and don't mind wading through some maths, here's a [link](https://sites.math.rutgers.edu/~cherlin/Courses/250/Lectures/250L26.html). So now that's out of the way and the idea of energy preservation is percolating around our skulls, we can jump into
 <br>
 
 
@@ -362,7 +362,7 @@ Well the problem is obviously that one channel's output is getting sent to two c
 **Incidentally, that's the question that started the chain of events that led me to writing this article - I wanted to throw an extra gain path into a Dattoro to see what would happen. Geraint's solution, as usual, was super elegant and inspired this whole FDN perspective shift approach to reverb, thank you Geraint xxx. 
 </sub>
 <h1><s>The Wii Fit balance board</s> Orthogonal Transforms</h1>
-Back to our idea of orthogonality, remember that it preserves the lengths of the input vector (and by extension, in our case, the input signal's energy). We need a way to somehow keep the matrix orthogonal, while adding extra paths to it. One way to do that is with orthogonal transforms, which sound scary, but really are things like rotation*, and reflection. So let's take a look at a 2d rotation matrix: 
+Back to our idea of orthogonality, remember that it preserves the lengths of the input vector (and by extension, in our case, the input signal's energy). We need a way to somehow keep the matrix orthogonal, while adding extra paths to it. One way to do that is with orthogonal transforms, which sound scary, but really are things like rotation and reflection. So let's take a look at a 2d rotation matrix: 
 <br>
 <br>
 
@@ -385,7 +385,7 @@ $$ \begin{bmatrix}
 $$
 
 <br> 
-Notice, by the way, that I embedded the rotation matrix so it replaced a 1 from each row of the mix matrix, so it wasn't just adding energy, it replaces those elements. I'll spare you the matrix multiplication on this, but you know the drill, check for orthogonality: 
+I'll spare you the matrix multiplication on this, but you know the drill, check for orthogonality: 
 <br> 
 <br>
 
@@ -423,7 +423,92 @@ Stage 4 feeds Stage 1 <br>
 So in image form: 
 ![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348372990_589367639957781_6793205839066917044_n.png?_nc_cat=100&ccb=1-7&_nc_sid=ae9488&_nc_ohc=65HwyEwLiDsAX-TuFtx&_nc_ht=scontent.fdub6-1.fna&oh=03_AdQld42GaoR7Nyz8m8B9kE5Bam1SL_xUeh1J04b92xqpCQ&oe=64965438)
 <br>
-Now we're <s>fuckin'</s> truckin'. There's no need to limit ourselves to 2d rotation matrices here, we could throw in a 3d one to really start to <b><i>feel something</i></b>. Take this funny little character for example: 
+A side note which I've been struggling to formulate an explanation for is that what you're actually doing here is multiplying your mix matrix (or a subset of your mix matrix) by your rotaton matrix. So in the example above, we're actually doing this operation, with the mix matrix subset taken as a 2 wide, starting from row 0, column 1:
+<br> 
+
+$$ \begin{bmatrix}
+1 & 0\\
+0 & 1 \\
+\end{bmatrix}
+.
+\begin{bmatrix} 
+c & s\\
+-s & c\\
+\end{bmatrix}
+=
+\begin{bmatrix} 
+c & s\\
+-s & c\\
+\end{bmatrix}
+$$
+
+<br>
+So because the submatrix we chose to take of our main mix matrix is just a 2x2 identity matrix, the rotation matrix is unaffected, so we can directly embed it. If though, we chose to embed at say, row 0, column 0, our operation would become 
+<br>
+
+
+$$ \begin{bmatrix}
+0 & 1\\
+0 & 0\\
+\end{bmatrix}
+.
+\begin{bmatrix}
+c & s\\
+-s & c\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+-s & c\\
+0 & 0\\
+\end{bmatrix}
+$$
+
+
+<br> 
+Solving for orthogonality on that submatrix embedded into the full matrix
+<br>
+
+
+$$\begin{bmatrix}
+-s & c & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+.
+\begin{bmatrix}
+-s & 0 & 0 & 1\\
+c & 0 & 0 & 0\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+\end{bmatrix}
+=
+\begin{bmatrix}
+s^2 + c^2 & 0 & 0 & -s\\
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+-s & 0 & 0 & 1\\
+\end{bmatrix}
+$$
+
+
+<br> 
+So, immediately, orthogonality requires that $ \sin{\theta} = 0 \therefore \theta = 0$ - this tracks because $\cos{\theta} = 1$ and $\cos{\theta}^2 = 1$ - So our embedding here is basically useless, because for it to be orthogonal, with the aforementioned conceit that $\cos{\theta} = 1$, our matrix has to be: 
+<br> 
+
+$$\begin{bmatrix}
+0 & 1 & 0 & 0\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1\\
+1 & 0 & 0 & 0\\
+\end{bmatrix}
+$$
+
+<br>
+which is exactly what we started with. The point being that in order for this idea to work, you need to be kinda careful about where you choose to embed your rotation matrices.
+<br>
+<br>
+There's no need to limit ourselves to 2d rotation matrices here, we could throw in a 3d one to really start to <b><i>feel something</i></b>. Take this funny little character for example: 
 <br> 
 ![image](https://ih1.redbubble.net/image.4673004017.2348/st,small,507x507-pad,600x600,f8f8f8.jpg)
 <br>
@@ -477,12 +562,11 @@ c^2 + s^2 & 0 & 0 & 0\\
 $$
 
 <br>
-Who could have possibly seen that coming? So in this case, in diagram form, we get: 
+I have never been more excited in my entire life. In this case, in diagram form, we get: 
 <br> 
 ![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/348367100_282880790833122_5438943096772146591_n.png?_nc_cat=111&ccb=1-7&_nc_sid=ae9488&_nc_ohc=qM_V61nZ5DQAX_NHBdR&_nc_ht=scontent.fdub6-1.fna&oh=03_AdT1uppFprYXiBfZA_pyc5V1doP8lnkPP_UIN6b68lY3UQ&oe=64962475)
 <br>
-It's worth noting I plugged these matrices in to kinda random places where they happened to slot in neatly, but it's possible to approach this a little more deliberately (and space the new gain paths apart further) by padding rotation matrices out to however many dimensions you want. For example, if I wanted to construct a rotation matrix to embed, wide enough that it could route channel 1 to channel 4, we can take our 3d rotation matrix which we were using(which is a y axis rotation, by the way, there are a couple more), and just sort of keep adding 1s on the diagonal. So that would look something like this: 
-<br> 
+If we want higher than 3 dimensional rotation matrices, we can sort of pad our 3d rotation matrix, by adding 1s on the diagonal, for example: 
 
 $$ 
 \begin{bmatrix} 
@@ -497,30 +581,19 @@ cos{\theta} & 0 & 0 & sin{\theta}\\
 0 & 0 & 1 & 0\\
 -sin{\theta} & 0 & 0 & cos{\theta}\\
 \end{bmatrix}
-$$
-
-<br>
-and the orthogonality holds for the transform, so we can safely embed it wherever we want really, for whatever routing we want, just making sure we don't have two 1s in the same row / column. Embedding this to route channel 1 to channel 4 for example, is equivalent to just replacing our entire matrix with that rotation matrix, as they're both 4x4: 
-<br>
-
-$$
+\Rightarrow
 \begin{bmatrix}
-c & 0 & 0 & s\\
-0 & 1 & 0 & 0\\
-0 & 0 & 1 & 0\\
--s & 0 & 0 & c\\
+cos{\theta} & 0 & 0 & 0 & sin{\theta}\\
+0 & 1 & 0 & 0 & 0\\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0\\
+-sin{\theta} & 0 & 0 & 0 & cos{\theta}\\
 \end{bmatrix}
 $$
 
-<br>
-The problem being, a weird side effect of doing that is that Stages 2 and 3 are now independent (the simple delay/feedback structure we discussed earlier), seeing as they only feedback into themselves, leaving our structure looking like this: <br> 
 
-![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/343766540_6353997581346473_4410611395961735661_n.png?_nc_cat=109&ccb=1-7&_nc_sid=ae9488&_nc_ohc=jyBltcG2ue8AX9psHwG&_nc_ht=scontent.fdub6-1.fna&oh=03_AdRFt0jgyrHz1UTpnqHygl98NngNErveBOisiEYZcJ3NTA&oe=64962878) 
 <br>
-Which is pretty bizarre, but yknow, maybe it sounds great??? 
-<br> 
-
- Another thing I wanted to mention is that it's fine to embed your matrix in a way that goes beyond the edge of the existing matrix, you'll just have to wrap it around (this is easier to explain by just demonstrating, embedding our new 4d rotation matrix starting at column 1, row 0 into our Dattoro mix matrix): 
+And you can extend this to however many dimensions you want. Another thing I wanted to mention is that it's fine to embed your matrix in a way that goes beyond the edge of the existing matrix, you'll just have to wrap it around (this is easier to explain by just demonstrating, embedding the 4d rotation matrix we derived above, starting at column 1, row 0 into our Dattoro mix matrix): 
 <br>
 
 $$
@@ -543,13 +616,15 @@ $$
 ![image](https://scontent.fdub6-1.fna.fbcdn.net/v/t1.15752-9/343286905_596565702454320_9015308588758288603_n.png?_nc_cat=104&ccb=1-7&_nc_sid=ae9488&_nc_ohc=4d_Sj6pxiScAX_py5Ll&_nc_ht=scontent.fdub6-1.fna&oh=03_AdRsi20r6hv50KCIXaHV6YF9-A8fzywv_oVicU8kyZMu1g&oe=64962299)
 
 <br>
-Orthogonality holds, we've got some extra routings, and we know that the system is still stable. As I mentioned earlier, you can <s>fuck around and find out</s> experiment with reflections, combining reflections and rotations, combining rotations on multiple axes, etc etc, the world is your metaphorical oyster, and it's pearl season. 
-
-<sub>
-*It's kind of intuitive that a rotation preserves the lengths of the input vector by the way if you think about it
-</sub>
+Orthogonality holds, we've got some extra routings, and we know that the system is still stable. To extend on this, as I mentioned earlier, you can <s>fuck around and find out</s> experiment with different axial rotations, reflections, combining reflections and rotations, combining rotations on multiple axes, etc etc. As some of the diagrams which made my brain feel like it was made of a soft french cheese show, it's pretty easy to get some off the wall routings out of doing this, and apply it to other reverb structures. There's also no reason you couldn't just replace the mix matrix with something entirely different, or go for maximal intermixing, and embed a normalised hadamard, or it's slightly less maximal but definitely dwelling on the maximal side of minimal friend, a householder. If it's given you some ideas on ways to extend it, and if I didn't cover them I'd love to hear them!
 <br>
-<h1>The long goodbye</h1>
+<h1>Epilogue</h1>
+The idea to do a write-up on this has been percolating for a few months now, because Googling some of these things really doesn't give you much to go on, so I guess it's as much for my own future reference as it is for people to actually read, but I do really hope if you made it this far it was a- informative and b- engaging, and thank you so much for reading! 
+<br>
+If you've any questions or want to correct any mistakes you found, you can find me lurking in [TAP](https://discord.gg/FxZ7znZ4) (@Meijis), and as mentioned earlier, I'd be thrilled if you reached out with ideas on extending this idea or anything. Until next time!!
+<br>
+- Syl
+<br>
   <script>
   MathJax = {
     tex: {inlineMath: [['$', '$']]}
